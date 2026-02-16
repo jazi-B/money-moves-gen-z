@@ -4,7 +4,16 @@ import { createClient } from "@/lib/supabase/server";
 import { generateSavingsPlan } from "@/lib/savings";
 import { revalidatePath } from "next/cache";
 
+const isDemo = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+
 export async function saveSettings(formData: FormData) {
+  if (isDemo) {
+    // Simulate delay
+    await new Promise(r => setTimeout(r, 500));
+    revalidatePath("/dashboard");
+    return { success: true };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -55,6 +64,8 @@ export async function saveSettings(formData: FormData) {
 }
 
 export async function saveGeminiKey(formData: FormData) {
+  if (isDemo) return { success: true };
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -84,6 +95,8 @@ export async function saveGeminiKey(formData: FormData) {
       target: 0,
       duration: 30,
       start_date: new Date().toISOString().split("T")[0],
+      updated_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     });
     if (error) return { error: error.message };
   }
@@ -93,6 +106,11 @@ export async function saveGeminiKey(formData: FormData) {
 }
 
 export async function toggleSavingComplete(planId: string, completed: boolean) {
+  if (isDemo) {
+    revalidatePath("/dashboard");
+    return { success: true };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -112,6 +130,12 @@ export async function toggleSavingComplete(planId: string, completed: boolean) {
 }
 
 export async function addTransaction(formData: FormData) {
+  if (isDemo) {
+    await new Promise(r => setTimeout(r, 500));
+    revalidatePath("/dashboard");
+    return { success: true };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -138,6 +162,11 @@ export async function addTransaction(formData: FormData) {
 }
 
 export async function deleteTransaction(transactionId: string) {
+  if (isDemo) {
+    revalidatePath("/dashboard");
+    return { success: true };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -157,6 +186,8 @@ export async function deleteTransaction(transactionId: string) {
 }
 
 export async function resetAllData() {
+  if (isDemo) return { success: true };
+
   const supabase = await createClient();
   const {
     data: { user },

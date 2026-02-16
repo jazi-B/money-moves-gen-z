@@ -9,14 +9,22 @@ export async function getAIAdvice(userPrompt: string): Promise<string> {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
-  const { data: settings } = await supabase
-    .from("settings")
-    .select("gemini_api_key")
-    .eq("user_id", user.id)
-    .single();
 
-  // Use DB key or Fallback to ENV key (User provided)
-  const apiKey = settings?.gemini_api_key || process.env.GEMINI_API_KEY;
+  let apiKey = process.env.GEMINI_API_KEY;
+  const isDemo = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+  if (!isDemo) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+    const { data: settings } = await supabase
+      .from("settings")
+      .select("gemini_api_key")
+      .eq("user_id", user.id)
+      .single();
+    if (settings?.gemini_api_key) apiKey = settings.gemini_api_key;
+  }
 
   if (!apiKey) {
     return "Bruh, I need a key. Add your Gemini API key in Settings so I can cook up some advice.";
@@ -69,18 +77,22 @@ export async function getAIAdvice(userPrompt: string): Promise<string> {
 
 export async function detectCategory(note: string): Promise<string> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return "Misc";
+  let user = null;
+  try { const { data } = await supabase.auth.getUser(); user = data.user; } catch { }
 
-  const { data: settings } = await supabase
-    .from("settings")
-    .select("gemini_api_key")
-    .eq("user_id", user.id)
-    .single();
+  const isDemo = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+  let apiKey = process.env.GEMINI_API_KEY;
 
-  const apiKey = settings?.gemini_api_key || process.env.GEMINI_API_KEY;
+  if (!isDemo) {
+    if (!user) return "Misc";
+    const { data: settings } = await supabase
+      .from("settings")
+      .select("gemini_api_key")
+      .eq("user_id", user.id)
+      .single();
+    if (settings?.gemini_api_key) apiKey = settings.gemini_api_key;
+  }
+
   if (!apiKey) return "Misc";
 
   try {
