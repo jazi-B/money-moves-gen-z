@@ -3,19 +3,8 @@ import type { Settings, SavingsPlanItem, Transaction, UserFinancialData } from "
 import { getTodayStr } from "@/lib/savings";
 
 export async function getUserFinancialData(): Promise<UserFinancialData> {
-  const supabase = await createClient();
-
-  // Safe Auth Check
-  let user = null;
-  try {
-    const { data } = await supabase.auth.getUser();
-    user = data.user;
-  } catch (e) {
-    // Keys might be missing or invalid
-  }
-
   // --- MOCK DATA MODE (If no DB or keys) ---
-  if (!user || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
     const today = getTodayStr();
     // Generate a quick mock plan
     const mockPlan = Array.from({ length: 30 }).map((_, i) => {
@@ -57,46 +46,59 @@ export async function getUserFinancialData(): Promise<UserFinancialData> {
     };
   }
 
-  // --- REAL DATA FETCHING ---
-  const [settingsRes, planRes, transactionsRes] = await Promise.all([
-    supabase.from("settings").select("*").eq("user_id", user.id).single(),
-    supabase
-      .from("savings_plan")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("date", { ascending: true }),
-    supabase
-      .from("transactions")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("date", { ascending: false }),
-  ]);
+  const supabase = await createClient();
 
-  const settings = (settingsRes.data as Settings) || null;
-  const savingsPlan = (planRes.data as SavingsPlanItem[]) || [];
-  const transactions = (transactionsRes.data as Transaction[]) || [];
+  // Safe Auth Check
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch (e) {
+    // Keys might be missing or invalid
+  }
 
-  const totalSaved = savingsPlan
-    .filter((s) => s.completed)
-    .reduce((sum, s) => sum + s.amount, 0);
+  if (!user) {
 
-  const totalSpent = transactions.reduce((sum, t) => sum + t.amount, 0);
+    // --- REAL DATA FETCHING ---
+    const [settingsRes, planRes, transactionsRes] = await Promise.all([
+      supabase.from("settings").select("*").eq("user_id", user.id).single(),
+      supabase
+        .from("savings_plan")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("date", { ascending: true }),
+      supabase
+        .from("transactions")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("date", { ascending: false }),
+    ]);
 
-  const income = settings?.income || 0;
-  const freeCapital = income - totalSpent - totalSaved;
+    const settings = (settingsRes.data as Settings) || null;
+    const savingsPlan = (planRes.data as SavingsPlanItem[]) || [];
+    const transactions = (transactionsRes.data as Transaction[]) || [];
 
-  const today = getTodayStr();
-  const remainingDays = savingsPlan.filter(
-    (s) => s.date >= today && !s.completed
-  ).length;
+    const totalSaved = savingsPlan
+      .filter((s) => s.completed)
+      .reduce((sum, s) => sum + s.amount, 0);
 
-  return {
-    settings,
-    savingsPlan,
-    transactions,
-    totalSaved,
-    totalSpent,
-    freeCapital,
-    remainingDays,
-  };
-}
+    const totalSpent = transactions.reduce((sum, t) => sum + t.amount, 0);
+
+    const income = settings?.income || 0;
+    const freeCapital = income - totalSpent - totalSaved;
+
+    const today = getTodayStr();
+    const remainingDays = savingsPlan.filter(
+      (s) => s.date >= today && !s.completed
+    ).length;
+
+    return {
+      settings,
+      savingsPlan,
+      transactions,
+      totalSaved,
+      totalSpent,
+      freeCapital,
+      remainingDays,
+    };
+  }
