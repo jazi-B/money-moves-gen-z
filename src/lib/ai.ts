@@ -58,7 +58,7 @@ export async function getAIAdvice(userPrompt: string): Promise<string> {
     if (!response.ok) {
       const err = await response.text();
       console.error("Gemini API error:", err);
-      return "System glitch! AI is taking a nap. Try again later.";
+      return `Gemini Error: ${err}`;
     }
 
     const data = await response.json();
@@ -68,7 +68,7 @@ export async function getAIAdvice(userPrompt: string): Promise<string> {
     );
   } catch (error) {
     console.error("AI Error:", error);
-    return "Wifi's acting up. Can't give advice rn.";
+    return `Network Error: ${error}`;
   }
 }
 
