@@ -10,11 +10,13 @@ import {
   Settings,
   Wallet,
   LogOut,
+  MessageSquare,
 } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/chat", icon: MessageSquare, label: "Chat" },
   { href: "/timeline", icon: Calendar, label: "Timeline" },
   { href: "/expenses", icon: Receipt, label: "Expenses" },
   { href: "/settings", icon: Settings, label: "Settings" },
@@ -44,11 +46,10 @@ export function Sidebar() {
             <Link key={item.href} href={item.href}>
               <motion.div
                 whileHover={{ x: 4 }}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                  isActive
-                    ? "bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 border border-emerald-500/20"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
-                }`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive
+                  ? "bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 border border-emerald-500/20"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
+                  }`}
               >
                 <item.icon className="w-5 h-5" />
                 <span className="font-medium text-sm">{item.label}</span>
@@ -84,9 +85,8 @@ export function MobileNav() {
           return (
             <Link key={item.href} href={item.href}>
               <div
-                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all ${
-                  isActive ? "text-emerald-400" : "text-white/40"
-                }`}
+                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all ${isActive ? "text-emerald-400" : "text-white/40"
+                  }`}
               >
                 <item.icon className="w-5 h-5" />
                 <span className="text-[10px] font-medium">{item.label}</span>
