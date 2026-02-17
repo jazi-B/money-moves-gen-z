@@ -3,7 +3,8 @@ import { type NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
   try {
-    return await updateSession(request);
+    // return await updateSession(request);
+    return NextResponse.next();
   } catch (e) {
     console.error("Middleware error:", e);
     return NextResponse.next({
