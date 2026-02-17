@@ -132,3 +132,61 @@ export async function detectCategory(note: string): Promise<string> {
     return "Misc";
   }
 }
+
+export type ChatMessage = { role: "user" | "model"; parts: { text: string }[] };
+
+export async function sendAIChatMessage(history: ChatMessage[], newMessage: string): Promise<string> {
+  const supabase = await createClient();
+  const DEFAULT_USER_ID = "00000000-0000-0000-0000-000000000000";
+  let apiKey = process.env.GEMINI_API_KEY;
+
+  // Fetch from DB
+  const { data: settings } = await supabase
+    .from("settings")
+    .select("gemini_api_key")
+    .eq("user_id", DEFAULT_USER_ID)
+    .single();
+
+  if (settings?.gemini_api_key) apiKey = settings.gemini_api_key;
+  if (!apiKey) return "Missing API Key. Check Settings.";
+
+  // Fetch financial context
+  const { data: plan } = await supabase.from("savings_plan").select("*").eq("user_id", DEFAULT_USER_ID);
+  const { data: txs } = await supabase.from("transactions").select("*").eq("user_id", DEFAULT_USER_ID).limit(10);
+
+  const context = `
+  User Financial Context:
+  - Recent Transactions: ${JSON.stringify(txs?.map(t => `${t.date}: ${t.amount} (${t.category})`) || [])}
+  - Savings Plan Progress: ${plan?.filter((p: any) => p.completed).length || 0} days completed.
+  
+  Persona: You are a Gen Z financial bestie. Use slang (no cap, bet, stonks). Be helpful but casual.
+  `;
+
+  const chatHistory = [
+    { role: "user", parts: [{ text: context }] },
+    { role: "model", parts: [{ text: "Bet, I got you. What's up?" }] },
+    ...history,
+    { role: "user", parts: [{ text: newMessage }] }
+  ];
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: chatHistory }),
+      }
+    );
+
+    if (!response.ok) {
+      const err = await response.text();
+      return `Error: ${err}`;
+    }
+
+    const data = await response.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || "AI is silent...";
+  } catch (e) {
+    return `Network Error: ${e}`;
+  }
+}
