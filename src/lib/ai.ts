@@ -4,26 +4,23 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function getAIAdvice(userPrompt: string): Promise<string> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
+  // const {
+  //   data: { user },
+  // } = await supabase.auth.getUser();
+  // if (!user) throw new Error("Not authenticated");
 
   let apiKey = process.env.GEMINI_API_KEY;
-  const isDemo = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const DEFAULT_USER_ID = "00000000-0000-0000-0000-000000000000";
 
-  if (!isDemo) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not authenticated");
-    const { data: settings } = await supabase
-      .from("settings")
-      .select("gemini_api_key")
-      .eq("user_id", user.id)
-      .single();
-    if (settings?.gemini_api_key) apiKey = settings.gemini_api_key;
+  // Fetch from DB settings if available
+  const { data: settings } = await supabase
+    .from("settings")
+    .select("gemini_api_key")
+    .eq("user_id", DEFAULT_USER_ID)
+    .single();
+
+  if (settings?.gemini_api_key) {
+    apiKey = settings.gemini_api_key;
   }
 
   if (!apiKey) {
@@ -77,20 +74,18 @@ export async function getAIAdvice(userPrompt: string): Promise<string> {
 
 export async function detectCategory(note: string): Promise<string> {
   const supabase = await createClient();
-  let user = null;
-  try { const { data } = await supabase.auth.getUser(); user = data.user; } catch { }
-
-  const isDemo = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const DEFAULT_USER_ID = "00000000-0000-0000-0000-000000000000";
   let apiKey = process.env.GEMINI_API_KEY;
 
-  if (!isDemo) {
-    if (!user) return "Misc";
-    const { data: settings } = await supabase
-      .from("settings")
-      .select("gemini_api_key")
-      .eq("user_id", user.id)
-      .single();
-    if (settings?.gemini_api_key) apiKey = settings.gemini_api_key;
+  // Fetch from DB settings if available
+  const { data: settings } = await supabase
+    .from("settings")
+    .select("gemini_api_key")
+    .eq("user_id", DEFAULT_USER_ID)
+    .single();
+
+  if (settings?.gemini_api_key) {
+    apiKey = settings.gemini_api_key;
   }
 
   if (!apiKey) return "Misc";
