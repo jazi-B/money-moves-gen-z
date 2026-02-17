@@ -69,10 +69,8 @@ export async function saveGeminiKey(formData: FormData) {
   if (isDemo) return { success: true };
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
+  const DEFAULT_USER_ID = "00000000-0000-0000-0000-000000000000";
+  const user = { id: DEFAULT_USER_ID };
 
   const gemini_api_key = formData.get("gemini_api_key") as string;
 
@@ -114,10 +112,8 @@ export async function toggleSavingComplete(planId: string, completed: boolean) {
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
+  const DEFAULT_USER_ID = "00000000-0000-0000-0000-000000000000";
+  const user = { id: DEFAULT_USER_ID };
 
   const { error } = await supabase
     .from("savings_plan")
@@ -139,10 +135,8 @@ export async function addTransaction(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
+  const DEFAULT_USER_ID = "00000000-0000-0000-0000-000000000000";
+  const user = { id: DEFAULT_USER_ID };
 
   const amount = parseInt(formData.get("amount") as string) || 0;
   const category = formData.get("category") as string;
@@ -170,10 +164,8 @@ export async function deleteTransaction(transactionId: string) {
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
+  const DEFAULT_USER_ID = "00000000-0000-0000-0000-000000000000";
+  const user = { id: DEFAULT_USER_ID };
 
   const { error } = await supabase
     .from("transactions")
@@ -191,10 +183,8 @@ export async function resetAllData() {
   if (isDemo) return { success: true };
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
+  const DEFAULT_USER_ID = "00000000-0000-0000-0000-000000000000";
+  const user = { id: DEFAULT_USER_ID };
 
   await supabase.from("savings_plan").delete().eq("user_id", user.id);
   await supabase.from("transactions").delete().eq("user_id", user.id);
