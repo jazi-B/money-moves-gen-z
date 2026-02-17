@@ -58,6 +58,17 @@ export async function getAIAdvice(userPrompt: string): Promise<string> {
     if (!response.ok) {
       const err = await response.text();
       console.error("Gemini API error:", err);
+
+      if (response.status === 404) {
+        try {
+          const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+          const listData = await listRes.json();
+          const models = listData.models?.map((m: any) => m.name).join(", ") || "No models found";
+          return `Gemini Error: Model not found. Available models for your key: ${models}`;
+        } catch (e) {
+          return `Gemini Error: ${err} (And failed to list models: ${e})`;
+        }
+      }
       return `Gemini Error: ${err}`;
     }
 
