@@ -1,4 +1,3 @@
-
 "use strict";
 "use client";
 
@@ -38,16 +37,16 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="max-w-3xl mx-auto h-[calc(100vh-120px)] flex flex-col">
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+        <div className="max-w-3xl mx-auto h-[calc(100vh-140px)] md:h-[calc(100vh-100px)] flex flex-col relative z-0">
+            <div className="mb-4 md:mb-6 shrink-0">
+                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                     Financial Bestie 🤖
                 </h1>
-                <p className="text-slate-400">Ask me about your spending, savings, or just roast me.</p>
+                <p className="text-sm md:text-base text-slate-400">Ask me about your spending, savings, or just roast me.</p>
             </div>
 
-            <Card className="flex-1 bg-slate-900/50 border-slate-800 p-4 overflow-y-auto mb-4 backdrop-blur-xl relative">
-                <div className="space-y-4">
+            <Card className="flex-1 bg-slate-900/50 border-slate-800 p-4 overflow-y-auto mb-4 backdrop-blur-xl relative z-0 scrollbar-hide rounded-2xl">
+                <div className="space-y-4 pb-20">
                     {messages.length === 0 && (
                         <div className="text-center text-slate-500 mt-20">
                             <Bot className="w-12 h-12 mx-auto mb-2 opacity-50" />
@@ -70,9 +69,9 @@ export default function ChatPage() {
                                 )}
 
                                 <div
-                                    className={`p-3 rounded-2xl max-w-[80%] text-sm ${msg.role === "user"
-                                            ? "bg-emerald-600 text-white rounded-tr-none"
-                                            : "bg-slate-800 text-slate-200 rounded-tl-none border border-slate-700"
+                                    className={`p-3 rounded-2xl max-w-[85%] text-sm ${msg.role === "user"
+                                            ? "bg-emerald-600 text-white rounded-tr-none shadow-lg shadow-emerald-900/20"
+                                            : "bg-slate-800 text-slate-200 rounded-tl-none border border-slate-700 shadow-lg"
                                         }`}
                                 >
                                     {msg.parts[0].text}
@@ -92,8 +91,9 @@ export default function ChatPage() {
                             <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0 mt-1">
                                 <Bot size={18} />
                             </div>
-                            <div className="bg-slate-800/50 p-3 rounded-2xl rounded-tl-none border border-slate-700/50">
+                            <div className="bg-slate-800/50 p-3 rounded-2xl rounded-tl-none border border-slate-700/50 flex items-center gap-2">
                                 <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
+                                <span className="text-xs text-slate-400">Thinking...</span>
                             </div>
                         </motion.div>
                     )}
@@ -106,18 +106,19 @@ export default function ChatPage() {
                     e.preventDefault();
                     handleSend();
                 }}
-                className="flex gap-2"
+                className="flex gap-2 sticky bottom-0 bg-slate-950/90 backdrop-blur-md p-3 -mx-4 md:mx-0 rounded-t-2xl border-t border-slate-800/50 z-50 shadow-2xl"
             >
                 <Input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Type a message..."
-                    className="bg-slate-900 border-slate-700 focus-visible:ring-emerald-500/50"
+                    autoFocus
+                    className="bg-slate-900 border-slate-700 focus-visible:ring-emerald-500/50 text-base"
                 />
                 <Button
                     type="submit"
                     disabled={isLoading || !input.trim()}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_0_20px_-5px_rgba(16,185,129,0.4)]"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-[0_0_20px_-5px_rgba(16,185,129,0.4)] aspect-square p-0 w-10 shrink-0"
                 >
                     <Send size={18} />
                 </Button>
