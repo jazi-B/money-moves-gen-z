@@ -9,13 +9,13 @@ export default async function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) redirect("/auth/login");
-  }
+  // if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  //   const supabase = await createClient();
+  //   const {
+  //     data: { user },
+  //   } = await supabase.auth.getUser();
+  //   if (!user) redirect("/auth/login");
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
