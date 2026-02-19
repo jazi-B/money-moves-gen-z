@@ -59,6 +59,27 @@ export default async function DashboardPage() {
         />
       </div>
 
+      {/* SAFE TO SPEND HERO */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-900 border border-indigo-500/30 shadow-2xl shadow-indigo-500/10 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+
+        <div className="z-10 text-center md:text-left">
+          <h2 className="text-indigo-300 font-bold tracking-widest text-xs uppercase mb-2">Safe Daily Allowance</h2>
+          <div className="text-5xl md:text-7xl font-black text-white tracking-tighter drop-shadow-lg">
+            {formatCurrency(data.safeDailySpend)}
+          </div>
+          <p className="text-indigo-200/60 text-sm mt-2 max-w-md">
+            You can spend exactly this much today without breaking your savings goal. <span className="text-white font-bold">Go wild (responsibly).</span>
+          </p>
+        </div>
+
+        <div className="z-10 shrink-0">
+          <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/40 animate-pulse-slow">
+            <DollarSign className="w-10 h-10 md:w-12 md:h-12 text-white" strokeWidth={3} />
+          </div>
+        </div>
+      </div>
+
       {/* KPI Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
