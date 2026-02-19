@@ -11,6 +11,8 @@ import {
   Bar,
   CartesianGrid,
   Cell,
+  AreaChart,
+  Area,
 } from "recharts";
 import type { SavingsPlanItem, Transaction } from "@/lib/types";
 import { GlassCard } from "@/components/glass-card";
@@ -147,6 +149,60 @@ export function ExpenseChart({ transactions }: { transactions: Transaction[] }) 
           No expenses recorded yet
         </div>
       )}
+    </GlassCard>
+  );
+}
+
+export function ProjectionChart({
+  currentBalance,
+  monthlyNet,
+}: {
+  currentBalance: number;
+  monthlyNet: number;
+}) {
+  const data = Array.from({ length: 7 }, (_, i) => {
+    const projected = currentBalance + monthlyNet * i;
+    const date = new Date();
+    date.setMonth(date.getMonth() + i);
+    return {
+      name: date.toLocaleDateString("en-US", { month: "short" }),
+      balance: Math.max(0, projected),
+    };
+  });
+
+  return (
+    <GlassCard>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center">
+          <TrendingUp className="w-4 h-4 text-white" />
+        </div>
+        <h3 className="text-white font-semibold">6-Month Projection</h3>
+      </div>
+      <ResponsiveContainer width="100%" height={300}>
+        <AreaChart data={data}>
+          <defs>
+            <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#818cf8" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+          <XAxis
+            dataKey="name"
+            stroke="rgba(255,255,255,0.3)"
+            tick={{ fontSize: 11 }}
+          />
+          <YAxis stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 11 }} />
+          <Tooltip content={<CustomTooltip />} />
+          <Area
+            type="monotone"
+            dataKey="balance"
+            stroke="#818cf8"
+            fillOpacity={1}
+            fill="url(#colorBalance)"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
     </GlassCard>
   );
 }
