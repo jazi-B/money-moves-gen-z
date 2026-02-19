@@ -11,12 +11,14 @@ import {
   Wallet,
   LogOut,
   MessageSquare,
+  Sparkles,
 } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/chat", icon: MessageSquare, label: "Chat" },
+  { href: "/crystal-ball", icon: Sparkles, label: "Crystal Ball" },
   { href: "/timeline", icon: Calendar, label: "Timeline" },
   { href: "/expenses", icon: Receipt, label: "Expenses" },
   { href: "/settings", icon: Settings, label: "Settings" },
