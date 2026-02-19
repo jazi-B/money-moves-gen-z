@@ -19,6 +19,7 @@ import {
   Zap,
   Film,
   HelpCircle,
+  Share2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -84,6 +85,13 @@ export function ExpensesList({
     });
   }
 
+  function handleSplit(t: Transaction) {
+    const splitAmount = Math.ceil(t.amount / 2);
+    const text = `Hey, I just paid Rs. ${t.amount} for ${t.category}${t.note ? ` (${t.note})` : ""}. You owe me Rs. ${splitAmount}. 💸 #MoneyMoves`;
+    navigator.clipboard.writeText(text);
+    toast.success("Split request copied to clipboard!");
+  }
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -119,9 +127,8 @@ export function ExpensesList({
             >
               <div className="flex items-center gap-4">
                 <div
-                  className={`w-10 h-10 rounded-lg bg-gradient-to-br ${
-                    categoryColors[t.category] || categoryColors.Misc
-                  } flex items-center justify-center text-white`}
+                  className={`w-10 h-10 rounded-lg bg-gradient-to-br ${categoryColors[t.category] || categoryColors.Misc
+                    } flex items-center justify-center text-white`}
                 >
                   {categoryIcons[t.category] || categoryIcons.Misc}
                 </div>
@@ -141,6 +148,13 @@ export function ExpensesList({
               </div>
               <div className="flex items-center gap-3">
                 <p className="text-white font-bold">{formatCurrency(t.amount)}</p>
+                <button
+                  onClick={() => handleSplit(t)}
+                  title="Split this bill"
+                  className="opacity-0 group-hover:opacity-100 p-2 rounded-lg hover:bg-emerald-500/20 text-white/30 hover:text-emerald-400 transition-all"
+                >
+                  <Share2 className="w-4 h-4" />
+                </button>
                 <button
                   onClick={() => handleDelete(t.id)}
                   disabled={isPending}
@@ -229,11 +243,10 @@ export function ExpensesList({
                         key={cat}
                         type="button"
                         onClick={() => setCategory(cat)}
-                        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition ${
-                          category === cat
-                            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                            : "bg-white/5 text-white/50 border border-white/10 hover:bg-white/10"
-                        }`}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition ${category === cat
+                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                          : "bg-white/5 text-white/50 border border-white/10 hover:bg-white/10"
+                          }`}
                       >
                         {categoryIcons[cat]}
                         {cat}
