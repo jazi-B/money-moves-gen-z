@@ -42,6 +42,8 @@ export async function getUserFinancialData(): Promise<UserFinancialData> {
     (s) => s.date >= today && !s.completed
   ).length;
 
+  const safeDailySpend = Math.floor(freeCapital / Math.max(remainingDays, 1));
+
   return {
     settings,
     savingsPlan,
@@ -50,6 +52,7 @@ export async function getUserFinancialData(): Promise<UserFinancialData> {
     totalSpent,
     freeCapital,
     remainingDays,
+    safeDailySpend,
   };
 }
 

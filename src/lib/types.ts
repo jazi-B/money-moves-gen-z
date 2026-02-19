@@ -37,6 +37,7 @@ export type UserFinancialData = {
   totalSpent: number;
   freeCapital: number;
   remainingDays: number;
+  safeDailySpend: number;
 };
 
 export const EXPENSE_CATEGORIES = [
